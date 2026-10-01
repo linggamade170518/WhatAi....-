@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1">
+
+<title>WhatAI</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  color:white;
+}
+
+body{
+  background:
+  radial-gradient(circle at 70% 20%,
+  rgba(145,50,255,.35),
+  transparent 35%),
+  linear-gradient(135deg,#040406,#11051b,#30065a);
+}
+
+.app{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+.top{
+  height:64px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:10px 14px;
+  background:rgba(0,0,0,.25);
+  border-bottom:1px solid #ffffff12;
+}
+
+.menu{
+  width:44px;
+  height:44px;
+  border:0;
+  border-radius:13px;
+  color:white;
+  background:#ffffff12;
+  font-size:25px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:bold;
+}
+
+.logo span{
+  color:#bd6aff;
+}
+
+.chat{
+  flex:1;
+  overflow:auto;
+  padding:25px 14px 100px;
+}
+
+.welcome{
+  height:75%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+}
+
+.logoBox{
+  width:85px;
+  height:85px;
+  border-radius:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  font-weight:bold;
+  background:linear-gradient(135deg,#6917ff,#bd61ff);
+  box-shadow:0 0 40px #8d3cff88;
+}
+
+.welcome h1{
+  font-size:38px;
+  margin:18px 0 5px;
+}
+
+.welcome h1 span{
+  color:#bd6aff;
+}
+
+.welcome p{
+  color:#aaa;
+  max-width:420px;
+  line-height:1.5;
+}
+
+.message{
+  max-width:800px;
+  margin:15px auto;
+  display:flex;
+}
+
+.user{
+  justify-content:flex-end;
+}
+
+.bubble{
+  max-width:85%;
+  padding:13px 16px;
+  border-radius:18px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.user .bubble{
+  background:linear-gradient(135deg,#7020df,#a44fff);
+  border-bottom-right-radius:5px;
+}
+
+.ai .bubble{
+  background:#ffffff0d;
+  border:1px solid #ffffff12;
+  border-bottom-left-radius:5px;
+}
+
+.inputArea{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:10px 13px 14px;
+  background:linear-gradient(
+    transparent,
+    #050509 35%
+  );
+}
+
+.input{
+  max-width:850px;
+  margin:auto;
+  display:flex;
+  gap:8px;
+  padding:7px 7px 7px 15px;
+  border-radius:20px;
+  background:#16111d;
+  border:1px solid #b45cff44;
+}
+
+textarea{
+  flex:1;
+  resize:none;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:white;
+  font-size:15px;
+  min-height:35px;
+  font-family:Arial;
+}
+
+.send{
+  width:44px;
+  height:44px;
+  border:0;
+  border-radius:14px;
+  color:white;
+  background:linear-gradient(135deg,#7020df,#b05aff);
+  font-size:20px;
+}
+
+/* SIDEBAR */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:#0009;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:10;
+}
+
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.sidebar{
+  position:fixed;
+  z-index:20;
+  left:0;
+  top:0;
+  bottom:0;
+  width:285px;
+  max-width:82%;
+  background:#0d0a12;
+  border-right:1px solid #ffffff15;
+  transform:translateX(-105%);
+  transition:.3s;
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar.open{
+  transform:translateX(0);
+}
+
+.sideTop{
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:15px;
+  border-bottom:1px solid #ffffff12;
+}
+
+.close{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:10px;
+  background:#ffffff12;
+  color:white;
+}
+
+.new{
+  margin:15px;
+  padding:13px;
+  border:0;
+  border-radius:14px;
+  color:white;
+  font-weight:bold;
+  background:linear-gradient(135deg,#7020df,#aa50ff);
+}
+
+.item{
+  margin:3px 9px;
+  padding:13px;
+  border-radius:12px;
+  color:#ddd;
+}
+
+.item:active{
+  background:#ffffff0d;
+}
+
+.title{
+  padding:10px 15px 5px;
+  color:#777;
+  font-size:12px;
+}
+
+.history{
+  flex:1;
+  overflow:auto;
+}
+
+.historyItem{
+  padding:11px 13px;
+  margin:3px 9px;
+  border-radius:10px;
+  color:#aaa;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.historyItem:active{
+  background:#ffffff0d;
+}
+
+@media(max-width:600px){
+
+  .welcome h1{
+    font-size:32px;
+  }
+
+  .logoBox{
+    width:70px;
+    height:70px;
+    font-size:35px;
+  }
+
+  .bubble{
+    max-width:90%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+    <button class="menu" onclick="openMenu()">☰</button>
+    <div class="logo">What<span>AI</span></div>
+  </div>
+
+  <div class="chat" id="chat">
+
+    <div class="welcome" id="welcome">
+
+      <div class="logoBox">W</div>
+
+      <h1>What<span>AI</span></h1>
+
+      <p>
+        AI online buatan kamu.
+        Tanya apa saja.
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="inputArea">
+
+    <div class="input">
+
+      <textarea
+        id="message"
+        placeholder="Tanyakan apa saja..."
+        onkeydown="keyDown(event)"
+      ></textarea>
+
+      <button class="send" onclick="send()">➤</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="overlay"
+     id="overlay"
+     onclick="closeMenu()"></div>
+
+<aside class="sidebar" id="sidebar">
+
+  <div class="sideTop">
+
+    <b>What<span style="color:#bd6aff">AI</span></b>
+
+    <button class="close"
+            onclick="closeMenu()">✕</button>
+
+  </div>
+
+  <button class="new"
+          onclick="newChat()">
+    ＋ New Chat
+  </button>
+
+  <div class="item">
+    🤖 Pilih AI
+  </div>
+
+  <div class="item">
+    ⭐ Favorit
+  </div>
+
+  <div class="item">
+    ⚙️ Settings
+  </div>
+
+  <div class="title">
+    HISTORY OBROLAN
+  </div>
+
+  <div class="history"
+       id="history"></div>
+
+</aside>
+
+<script>
+
+const chat =
+document.getElementById("chat");
+
+const message =
+document.getElementById("message");
+
+let history =
+JSON.parse(
+  localStorage.getItem("whatAI_history") || "[]"
+);
+
+function openMenu(){
+
+  document
+    .getElementById("sidebar")
+    .classList.add("open");
+
+  document
+    .getElementById("overlay")
+    .classList.add("show");
+}
+
+function closeMenu(){
+
+  document
+    .getElementById("sidebar")
+    .classList.remove("open");
+
+  document
+    .getElementById("overlay")
+    .classList.remove("show");
+}
+
+function keyDown(e){
+
+  if(e.key==="Enter" && !e.shiftKey){
+
+    e.preventDefault();
+
+    send();
+  }
+}
+
+async function send(){
+
+  const text =
+    message.value.trim();
+
+  if(!text) return;
+
+  document
+    .getElementById("welcome")
+    ?.remove();
+
+  addMessage(text,"user");
+
+  message.value="";
+
+  history.unshift(text);
+
+  history =
+    history.slice(0,30);
+
+  localStorage.setItem(
+    "whatAI_history",
+    JSON.stringify(history)
+  );
+
+  renderHistory();
+
+  const loading =
+    document.createElement("div");
+
+  loading.className="message ai";
+  loading.id="loading";
+
+  loading.innerHTML=`
+    <div class="bubble">
+      WhatAI sedang berpikir...
+    </div>
+  `;
+
+  chat.appendChild(loading);
+
+  chat.scrollTop=chat.scrollHeight;
+
+  try{
+
+    const response =
+      await fetch("/api/chat",{
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:JSON.stringify({
+          message:text
+        })
+
+      });
+
+    const data =
+      await response.json();
+
+    loading.remove();
+
+    if(data.error){
+
+      addMessage(
+        "❌ "+data.error,
+        "ai"
+      );
+
+      return;
+    }
+
+    addMessage(
+      data.answer,
+      "ai"
+    );
+
+  }catch(error){
+
+    loading.remove();
+
+    addMessage(
+      "❌ Tidak bisa terhubung ke server. Pastikan WhatAI sedang online.",
+      "ai"
+    );
+  }
+}
+
+function addMessage(text,type){
+
+  const message =
+    document.createElement("div");
+
+  message.className =
+    "message "+type;
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className="bubble";
+
+  bubble.textContent=text;
+
+  message.appendChild(bubble);
+
+  chat.appendChild(message);
+
+  chat.scrollTop=
+    chat.scrollHeight;
+}
+
+function newChat(){
+
+  closeMenu();
+
+  chat.innerHTML=`
+    <div class="welcome" id="welcome">
+
+      <div class="logoBox">W</div>
+
+      <h1>What<span>AI</span></h1>
+
+      <p>
+        AI online buatan kamu.
+        Tanya apa saja.
+      </p>
+
+    </div>
+  `;
+}
+
+function renderHistory(){
+
+  const box =
+    document.getElementById("history");
+
+  box.innerHTML="";
+
+  history.forEach(text=>{
+
+    const item =
+      document.createElement("div");
+
+    item.className="historyItem";
+
+    item.textContent=text;
+
+    item.onclick=()=>{
+
+      closeMenu();
+
+      newChat();
+
+      setTimeout(()=>{
+
+        addMessage(text,"user");
+
+        sendHistory(text);
+
+      },100);
+
+    };
+
+    box.appendChild(item);
+  });
+}
+
+async function sendHistory(text){
+
+  const loading =
+    document.createElement("div");
+
+  loading.className="message ai";
+
+  loading.innerHTML=`
+    <div class="bubble">
+      WhatAI sedang berpikir...
+    </div>
+  `;
+
+  chat.appendChild(loading);
+
+  try{
+
+    const response =
+      await fetch("/api/chat",{
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:JSON.stringify({
+          message:text
+        })
+
+      });
+
+    const data =
+      await response.json();
+
+    loading.remove();
+
+    addMessage(
+      data.answer || data.error,
+      "ai"
+    );
+
+  }catch(e){
+
+    loading.remove();
+
+    addMessage(
+      "Tidak bisa terhubung ke server.",
+      "ai"
+    );
+  }
+}
+
+renderHistory();
+
+</script>
+
+</body>
+  </html>
